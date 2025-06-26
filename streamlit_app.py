@@ -227,6 +227,66 @@ def render_man_relationship_screen():
     ]
     desire_marry_values = [20, 40, 60, 80, 95]
 
+    # Relationship with spouse family levels
+    spouse_family_levels = [
+        "Strongly opposed (family actively against the spouse choice)",
+        "Disapproval (family doesn't approve but tolerates)",
+        "Neutral/Mixed (family has mixed feelings or indifferent)",
+        "Approval (family likes and supports the spouse choice)",
+        "Strong endorsement (family enthusiastically supports and celebrates)"
+    ]
+    spouse_family_values = [15, 35, 50, 75, 90]
+
+    # Loyalty levels
+    loyalty_levels = [
+        "Very disloyal (frequently unfaithful or betrays trust)",
+        "Somewhat disloyal (occasional betrayals or unfaithfulness)",
+        "Neutral/Uncertain (mixed loyalty, situational faithfulness)",
+        "Mostly loyal (generally faithful with minor lapses)",
+        "Completely loyal (absolutely faithful and trustworthy)"
+    ]
+    loyalty_values = [10, 30, 50, 75, 95]
+
+    # Relation with non-spouse before marriage levels
+    non_spouse_relation_levels = [
+        "Very problematic (multiple serious relationships with unresolved issues)",
+        "Somewhat problematic (few relationships with some lingering complications)",
+        "Neutral/Mixed (normal dating history with minor past relationship effects)",
+        "Mostly positive (healthy past relationships that ended well)",
+        "Very positive (excellent relationship history, learned and grew from experiences)"
+    ]
+    non_spouse_relation_values = [20, 40, 60, 80, 95]
+
+    # Spouse confirmed by family levels
+    spouse_confirmed_levels = [
+        "Strongly rejected (family completely opposes and refuses to accept spouse)",
+        "Not confirmed (family disapproves but doesn't actively oppose)",
+        "Neutral/Uncertain (family has mixed feelings or is undecided)",
+        "Confirmed (family approves and accepts the spouse choice)",
+        "Strongly confirmed (family enthusiastically endorses and celebrates the choice)"
+    ]
+    spouse_confirmed_values = [10, 30, 50, 75, 95]
+
+    # Love levels
+    love_levels = [
+        "No love (feels no romantic love or affection)",
+        "Little love (minimal romantic feelings, mostly companionship)",
+        "Moderate love (some romantic feelings but not overwhelming)",
+        "Strong love (deep romantic feelings and emotional connection)",
+        "Passionate love (intense, overwhelming romantic love and devotion)"
+    ]
+    love_values = [15, 35, 55, 80, 95]
+
+    # Love levels
+    love_levels = [
+        "No love (feels no romantic love or affection)",
+        "Little love (minimal romantic feelings, mostly companionship)",
+        "Moderate love (some romantic feelings but not overwhelming)",
+        "Strong love (deep romantic feelings and emotional connection)",
+        "Passionate love (intense, overwhelming romantic love and devotion)"
+    ]
+    love_values = [15, 35, 55, 80, 95]
+
     for feature in perspective_dependent_features:
         if feature == "Social Gap":
             selected_social_gap = st.selectbox(
@@ -245,6 +305,51 @@ def render_man_relationship_screen():
                 key="man_desire_marry"
             )
             st.session_state.man_inputs[feature] = desire_marry_values[desire_marry_levels.index(selected_desire_marry)]
+
+        elif feature == "Relationship with the Spouse Family":
+            selected_spouse_family = st.selectbox(
+                "Man's relationship with woman's family",
+                spouse_family_levels,
+                index=2,
+                key="man_spouse_family"
+            )
+            st.session_state.man_inputs[feature] = spouse_family_values[spouse_family_levels.index(selected_spouse_family)]
+
+        elif feature == "Loyalty":
+            selected_loyalty = st.selectbox(
+                "Man's loyalty in the relationship",
+                loyalty_levels,
+                index=3,
+                key="man_loyalty"
+            )
+            st.session_state.man_inputs[feature] = loyalty_values[loyalty_levels.index(selected_loyalty)]
+
+        elif feature == "Relation with Non-spouse Before Marriage":
+            selected_non_spouse_relation = st.selectbox(
+                "Man's past relationships before marriage",
+                non_spouse_relation_levels,
+                index=2,
+                key="man_non_spouse_relation"
+            )
+            st.session_state.man_inputs[feature] = non_spouse_relation_values[non_spouse_relation_levels.index(selected_non_spouse_relation)]
+
+        elif feature == "Spouse Confirmed by Family":
+            selected_spouse_confirmed = st.selectbox(
+                "How much man's family confirms/accepts the woman",
+                spouse_confirmed_levels,
+                index=3,
+                key="man_spouse_confirmed"
+            )
+            st.session_state.man_inputs[feature] = spouse_confirmed_values[spouse_confirmed_levels.index(selected_spouse_confirmed)]
+
+        elif feature == "Love":
+            selected_love = st.selectbox(
+                "Man's level of love for the woman",
+                love_levels,
+                index=3,
+                key="man_love"
+            )
+            st.session_state.man_inputs[feature] = love_values[love_levels.index(selected_love)]
 
         # Add other perspective-dependent features here...
         else:
@@ -352,6 +457,56 @@ def render_woman_relationship_screen():
     ]
     desire_marry_values = [20, 40, 60, 80, 95]
 
+    # Relationship with spouse family levels
+    spouse_family_levels = [
+        "Strongly opposed (family actively against the spouse choice)",
+        "Disapproval (family doesn't approve but tolerates)",
+        "Neutral/Mixed (family has mixed feelings or indifferent)",
+        "Approval (family likes and supports the spouse choice)",
+        "Strong endorsement (family enthusiastically supports and celebrates)"
+    ]
+    spouse_family_values = [15, 35, 50, 75, 90]
+
+    # Loyalty levels
+    loyalty_levels = [
+        "Very disloyal (frequently unfaithful or betrays trust)",
+        "Somewhat disloyal (occasional betrayals or unfaithfulness)",
+        "Neutral/Uncertain (mixed loyalty, situational faithfulness)",
+        "Mostly loyal (generally faithful with minor lapses)",
+        "Completely loyal (absolutely faithful and trustworthy)"
+    ]
+    loyalty_values = [10, 30, 50, 75, 95]
+
+    # Relation with non-spouse before marriage levels
+    non_spouse_relation_levels = [
+        "Very problematic (multiple serious relationships with unresolved issues)",
+        "Somewhat problematic (few relationships with some lingering complications)",
+        "Neutral/Mixed (normal dating history with minor past relationship effects)",
+        "Mostly positive (healthy past relationships that ended well)",
+        "Very positive (excellent relationship history, learned and grew from experiences)"
+    ]
+    non_spouse_relation_values = [20, 40, 60, 80, 95]
+
+    # Spouse confirmed by family levels
+    spouse_confirmed_levels = [
+        "Strongly rejected (family completely opposes and refuses to accept spouse)",
+        "Not confirmed (family disapproves but doesn't actively oppose)",
+        "Neutral/Uncertain (family has mixed feelings or is undecided)",
+        "Confirmed (family approves and accepts the spouse choice)",
+        "Strongly confirmed (family enthusiastically endorses and celebrates the choice)"
+    ]
+    spouse_confirmed_values = [10, 30, 50, 75, 95]
+
+    # Love levels
+    love_levels = [
+        "No love (feels no romantic love or affection)",
+        "Little love (minimal romantic feelings, mostly companionship)",
+        "Moderate love (some romantic feelings but not overwhelming)",
+        "Strong love (deep romantic feelings and emotional connection)",
+        "Passionate love (intense, overwhelming romantic love and devotion)"
+    ]
+    love_values = [15, 35, 55, 80, 95]
+
     for feature in perspective_dependent_features:
         if feature == "Social Gap":
             selected_social_gap = st.selectbox(
@@ -370,6 +525,51 @@ def render_woman_relationship_screen():
                 key="woman_desire_marry"
             )
             st.session_state.woman_inputs[feature] = desire_marry_values[desire_marry_levels.index(selected_desire_marry)]
+
+        elif feature == "Relationship with the Spouse Family":
+            selected_spouse_family = st.selectbox(
+                "Woman's relationship with man's family",
+                spouse_family_levels,
+                index=2,
+                key="woman_spouse_family"
+            )
+            st.session_state.woman_inputs[feature] = spouse_family_values[spouse_family_levels.index(selected_spouse_family)]
+
+        elif feature == "Loyalty":
+            selected_loyalty = st.selectbox(
+                "Woman's loyalty in the relationship",
+                loyalty_levels,
+                index=3,
+                key="woman_loyalty"
+            )
+            st.session_state.woman_inputs[feature] = loyalty_values[loyalty_levels.index(selected_loyalty)]
+
+        elif feature == "Relation with Non-spouse Before Marriage":
+            selected_non_spouse_relation = st.selectbox(
+                "Woman's past relationships before marriage",
+                non_spouse_relation_levels,
+                index=2,
+                key="woman_non_spouse_relation"
+            )
+            st.session_state.woman_inputs[feature] = non_spouse_relation_values[non_spouse_relation_levels.index(selected_non_spouse_relation)]
+
+        elif feature == "Spouse Confirmed by Family":
+            selected_spouse_confirmed = st.selectbox(
+                "How much woman's family confirms/accepts the man",
+                spouse_confirmed_levels,
+                index=3,
+                key="woman_spouse_confirmed"
+            )
+            st.session_state.woman_inputs[feature] = spouse_confirmed_values[spouse_confirmed_levels.index(selected_spouse_confirmed)]
+
+        elif feature == "Love":
+            selected_love = st.selectbox(
+                "Woman's level of love for the man",
+                love_levels,
+                index=3,
+                key="woman_love"
+            )
+            st.session_state.woman_inputs[feature] = love_values[love_levels.index(selected_love)]
 
         # Add other perspective-dependent features here...
         else:
@@ -408,6 +608,187 @@ def render_shared_screen():
                 key="economic_similarity"
             )
             st.session_state.shared_inputs[feature] = economic_values[economic_levels.index(selected_economic)]
+
+        elif feature == "Cultural Similarities":
+            cultural_similarity_levels = [
+                "Very different cultures (completely different traditions, values, customs)",
+                "Somewhat different (different cultural backgrounds with some overlap)",
+                "Moderately similar (some shared cultural values and traditions)",
+                "Very similar (same cultural background and shared values)",
+                "Identical cultural backgrounds (same ethnicity, traditions, and customs)"
+            ]
+            cultural_similarity_values = [15, 35, 55, 80, 95]
+
+            selected_cultural_similarity = st.selectbox(
+                "Cultural Similarities",
+                cultural_similarity_levels,
+                index=2,
+                key="cultural_similarities"
+            )
+            st.session_state.shared_inputs[feature] = cultural_similarity_values[cultural_similarity_levels.index(selected_cultural_similarity)]
+
+        elif feature == "Common Interests":
+            common_interests_levels = [
+                "No common interests (completely different hobbies and activities)",
+                "Few common interests (minimal overlap in activities and hobbies)",
+                "Some common interests (moderate overlap in leisure activities)",
+                "Many common interests (significant shared hobbies and activities)",
+                "Almost identical interests (love doing the same things together)"
+            ]
+            common_interests_values = [20, 40, 60, 80, 95]
+
+            selected_common_interests = st.selectbox(
+                "Common Interests",
+                common_interests_levels,
+                index=2,
+                key="common_interests"
+            )
+            st.session_state.shared_inputs[feature] = common_interests_values[common_interests_levels.index(selected_common_interests)]
+
+        elif feature == "Religion Compatibility":
+            religion_compatibility_levels = [
+                "Completely incompatible (conflicting religious beliefs and practices)",
+                "Mostly incompatible (different religions with some tolerance)",
+                "Somewhat compatible (different beliefs but mutual respect)",
+                "Very compatible (same religion or complementary spiritual beliefs)",
+                "Perfectly compatible (identical religious beliefs and practices)"
+            ]
+            religion_compatibility_values = [15, 35, 55, 80, 95]
+
+            selected_religion_compatibility = st.selectbox(
+                "Religion Compatibility",
+                religion_compatibility_levels,
+                index=3,
+                key="religion_compatibility"
+            )
+            st.session_state.shared_inputs[feature] = religion_compatibility_values[religion_compatibility_levels.index(selected_religion_compatibility)]
+
+        elif feature == "No of Children from Previous Marriage":
+            children_options = [
+                "0 children",
+                "1 child",
+                "2 children",
+                "3 children",
+                "4 children",
+                "5+ children"
+            ]
+            children_values = [0, 1, 2, 3, 4, 5]
+
+            selected_children = st.selectbox(
+                "Number of Children from Previous Marriage (combined total)",
+                children_options,
+                index=0,
+                key="no_children_previous_marriage"
+            )
+            st.session_state.shared_inputs[feature] = children_values[children_options.index(selected_children)]
+
+        elif feature == "Engagement Time":
+            engagement_time_levels = [
+                "Very short (less than 6 months - rushed decision)",
+                "Short (6 months to 1 year - quick engagement)",
+                "Moderate (1-2 years - adequate time to know each other)",
+                "Long (2-3 years - thorough preparation and planning)",
+                "Very long (3+ years - extensive courtship and preparation)"
+            ]
+            engagement_time_values = [30, 50, 75, 85, 70]
+
+            selected_engagement_time = st.selectbox(
+                "Engagement Time Duration",
+                engagement_time_levels,
+                index=2,
+                key="engagement_time"
+            )
+            st.session_state.shared_inputs[feature] = engagement_time_values[engagement_time_levels.index(selected_engagement_time)]
+
+        elif feature == "Commitment":
+            commitment_levels = [
+                "Very low commitment (one or both partners show little dedication)",
+                "Low commitment (minimal effort to maintain the relationship)",
+                "Moderate commitment (average dedication with some effort)",
+                "High commitment (strong dedication and effort from both partners)",
+                "Very high commitment (exceptional dedication and unwavering devotion)"
+            ]
+            commitment_values = [15, 35, 55, 80, 95]
+
+            selected_commitment = st.selectbox(
+                "Overall Commitment Level",
+                commitment_levels,
+                index=3,
+                key="commitment"
+            )
+            st.session_state.shared_inputs[feature] = commitment_values[commitment_levels.index(selected_commitment)]
+
+        elif feature == "The Sense of Having Children":
+            children_sense_levels = [
+                "Strongly opposed (one or both partners strongly against having children)",
+                "Not interested (little to no desire for children together)",
+                "Neutral/Uncertain (mixed feelings or undecided about having children)",
+                "Interested (both partners want children and are planning for them)",
+                "Strongly committed (both partners deeply desire children and actively planning)"
+            ]
+            children_sense_values = [20, 40, 60, 80, 95]
+
+            selected_children_sense = st.selectbox(
+                "The Sense of Having Children Together",
+                children_sense_levels,
+                index=3,
+                key="sense_having_children"
+            )
+            st.session_state.shared_inputs[feature] = children_sense_values[children_sense_levels.index(selected_children_sense)]
+
+        elif feature == "The Proportion of Common Genes":
+            common_genes_levels = [
+                "No genetic relation (completely different ethnic/family backgrounds)",
+                "Distant relation (different ethnicities but some regional overlap)",
+                "Moderate relation (same broad ethnic group or regional background)",
+                "Close relation (same ethnic subgroup or similar family lineages)",
+                "Very close relation (same community/tribal background or distant cousins)"
+            ]
+            common_genes_values = [50, 60, 70, 80, 75]
+
+            selected_common_genes = st.selectbox(
+                "The Proportion of Common Genes/Family Background",
+                common_genes_levels,
+                index=2,
+                key="proportion_common_genes"
+            )
+            st.session_state.shared_inputs[feature] = common_genes_values[common_genes_levels.index(selected_common_genes)]
+
+        elif feature == "Divorce in the Family of Grade 1":
+            family_divorce_levels = [
+                "Multiple divorces (both families have extensive divorce history)",
+                "Frequent divorces (one or both families have several divorces)",
+                "Some divorces (moderate divorce history in immediate families)",
+                "Few divorces (minimal divorce history in immediate families)",
+                "No divorces (both families have strong marriage traditions)"
+            ]
+            family_divorce_values = [20, 35, 50, 75, 90]
+
+            selected_family_divorce = st.selectbox(
+                "Divorce History in Immediate Families (parents, siblings)",
+                family_divorce_levels,
+                index=3,
+                key="divorce_family_grade1"
+            )
+            st.session_state.shared_inputs[feature] = family_divorce_values[family_divorce_levels.index(selected_family_divorce)]
+
+        elif feature == "Social Similarities":
+            social_similarity_levels = [
+                "Very different social backgrounds (completely different social circles)",
+                "Somewhat different (different social groups but some overlap)",
+                "Moderately similar (some shared social connections and backgrounds)",
+                "Very similar (same social circles and similar backgrounds)",
+                "Identical social backgrounds (grew up in same community/social group)"
+            ]
+            social_similarity_values = [20, 40, 60, 80, 95]
+
+            selected_social_similarity = st.selectbox(
+                "Social Similarities",
+                social_similarity_levels,
+                index=2,
+                key="social_similarities"
+            )
+            st.session_state.shared_inputs[feature] = social_similarity_values[social_similarity_levels.index(selected_social_similarity)]
 
         else:
             value = st.slider(
