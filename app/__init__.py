@@ -1,1 +1,0 @@
-# Divorce Prediction App Package

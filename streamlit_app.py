@@ -1,9 +1,15 @@
+#!/usr/bin/env python3
+"""
+Main entry point for the Divorce Prediction System
+This file should be used when deploying to platforms like Streamlit Cloud, Heroku, Railway
+Run with: streamlit run streamlit_app.py
+"""
+
 import streamlit as st
 import pandas as pd
 import pickle
 
-# Import the dual perspective predictor from utils
-from app.utils.dual_perspective_predictor import DualPerspectivePredictor
+# The dual perspective predictor is loaded from the saved model file
 
 # Initialize session state for navigation
 if 'current_screen' not in st.session_state:
@@ -21,16 +27,13 @@ SCREENS = {
 
 # Load dual-perspective model and configuration
 with open("model/divorce_model.pkl", "rb") as f:
-    model = pickle.load(f)
+    predictor = pickle.load(f)  # This is already a DualPerspectivePredictor object
 
 with open("model/divorce_features.pkl", "rb") as f:
     feature_list = pickle.load(f)
 
 with open("model/feature_categories.pkl", "rb") as f:
     feature_categories = pickle.load(f)
-
-# Initialize the dual-perspective predictor
-predictor = DualPerspectivePredictor(model, feature_list, feature_categories)
 
 # Get feature categories
 individual_features = feature_categories['individual']
@@ -70,13 +73,13 @@ def create_navigation_buttons():
 
 # Education levels for reuse
 education_levels = [
-    "Completed primary school",
-    "Completed secondary school", 
-    "Completed high school",
-    "Have HND",
-    "Have bachelor or associate degree",
-    "Have masters degree",
-    "Have PhD"
+    "Completed Primary School",
+    "Completed Secondary School", 
+    "Completed High School",
+    "HND",
+    "Bachelor or Associate degree",
+    "Masters",
+    "PhD"
 ]
 education_values = [10, 20, 30, 40, 50, 60, 70]
 
@@ -129,7 +132,7 @@ socializing_age_values = [30, 50, 70, 80, 75, 60]
 
 def render_man_personal_screen():
     st.markdown("**Enter the man's personal characteristics:**")
-    
+
     for feature in individual_features:
         if feature == "Education":
             selected_education = st.selectbox(
@@ -139,7 +142,7 @@ def render_man_personal_screen():
                 key="man_education"
             )
             st.session_state.man_inputs[feature] = education_values[education_levels.index(selected_education)]
-            
+
         elif feature == "Mental Health":
             selected_mental_health = st.selectbox(
                 "Man's Mental Health",
@@ -148,7 +151,7 @@ def render_man_personal_screen():
                 key="man_mental_health"
             )
             st.session_state.man_inputs[feature] = mental_health_values[mental_health_levels.index(selected_mental_health)]
-            
+
         elif feature == "Self Confidence":
             confidence_rating = st.slider(
                 "Man's Self Confidence (0-5 stars)",
@@ -156,7 +159,7 @@ def render_man_personal_screen():
                 key="man_confidence"
             )
             st.session_state.man_inputs[feature] = confidence_rating * 20
-            
+
         elif feature == "Good Income":
             selected_income = st.selectbox(
                 "Man's Income Level",
@@ -165,7 +168,7 @@ def render_man_personal_screen():
                 key="man_income"
             )
             st.session_state.man_inputs[feature] = income_values[income_levels.index(selected_income)]
-            
+
         elif feature == "Addiction":
             selected_addiction = st.selectbox(
                 "Man's Addiction Level",
@@ -174,7 +177,7 @@ def render_man_personal_screen():
                 key="man_addiction"
             )
             st.session_state.man_inputs[feature] = addiction_values[addiction_levels.index(selected_addiction)]
-            
+
         elif feature == "Independency":
             selected_independence = st.selectbox(
                 "Man's Independence Level",
@@ -183,7 +186,7 @@ def render_man_personal_screen():
                 key="man_independence"
             )
             st.session_state.man_inputs[feature] = independence_values[independence_levels.index(selected_independence)]
-            
+
         elif feature == "Start Socializing with the Opposite Sex Age ":
             selected_socializing_age = st.selectbox(
                 "Man's Age When Started Dating",
@@ -192,7 +195,7 @@ def render_man_personal_screen():
                 key="man_socializing_age"
             )
             st.session_state.man_inputs[feature] = socializing_age_values[socializing_age_levels.index(selected_socializing_age)]
-            
+
         else:
             value = st.slider(
                 f"Man's {feature}",
@@ -203,7 +206,7 @@ def render_man_personal_screen():
 
 def render_man_relationship_screen():
     st.markdown("**Enter the man's relationship perspective:**")
-    
+
     # Social gap levels
     social_gap_levels = [
         "No social gap (same social status)",
@@ -213,7 +216,7 @@ def render_man_relationship_screen():
         "Very large social gap (major class differences)"
     ]
     social_gap_values = [85, 70, 55, 40, 25]
-    
+
     # Desire to marry levels
     desire_marry_levels = [
         "No desire to marry",
@@ -223,7 +226,7 @@ def render_man_relationship_screen():
         "Very strong desire to marry"
     ]
     desire_marry_values = [20, 40, 60, 80, 95]
-    
+
     for feature in perspective_dependent_features:
         if feature == "Social Gap":
             selected_social_gap = st.selectbox(
@@ -233,7 +236,7 @@ def render_man_relationship_screen():
                 key="man_social_gap"
             )
             st.session_state.man_inputs[feature] = social_gap_values[social_gap_levels.index(selected_social_gap)]
-            
+
         elif feature == "Desire to Marry":
             selected_desire_marry = st.selectbox(
                 "Man's desire to marry",
@@ -242,7 +245,7 @@ def render_man_relationship_screen():
                 key="man_desire_marry"
             )
             st.session_state.man_inputs[feature] = desire_marry_values[desire_marry_levels.index(selected_desire_marry)]
-            
+
         # Add other perspective-dependent features here...
         else:
             value = st.slider(
@@ -492,3 +495,8 @@ elif current_screen['type'] == 'results':
 
 st.markdown("---")
 create_navigation_buttons()
+
+# Main execution block for running directly
+if __name__ == "__main__":
+    # This allows the script to be run directly with: streamlit run streamlit_app.py
+    pass

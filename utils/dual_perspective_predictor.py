@@ -1,4 +1,6 @@
 # Dual-Perspective Prediction Class
+import pandas as pd
+
 class DualPerspectivePredictor:
     def __init__(self, base_model, feature_list, feature_categories):
         self.base_model = base_model
@@ -22,15 +24,19 @@ class DualPerspectivePredictor:
         # Create feature vectors for both perspectives
         man_vector = self._create_feature_vector(man_inputs, shared_inputs, 'man')
         woman_vector = self._create_feature_vector(woman_inputs, shared_inputs, 'woman')
-        
+
+        # Convert to DataFrames with proper feature names to avoid warnings
+        man_df = pd.DataFrame([man_vector], columns=self.feature_list)
+        woman_df = pd.DataFrame([woman_vector], columns=self.feature_list)
+
         # Get predictions
-        man_prediction = self.base_model.predict([man_vector])[0]
-        woman_prediction = self.base_model.predict([woman_vector])[0]
-        
+        man_prediction = self.base_model.predict(man_df)[0]
+        woman_prediction = self.base_model.predict(woman_df)[0]
+
         # Get prediction probabilities if available
         try:
-            man_prob = self.base_model.predict_proba([man_vector])[0][1]
-            woman_prob = self.base_model.predict_proba([woman_vector])[0][1]
+            man_prob = self.base_model.predict_proba(man_df)[0][1]
+            woman_prob = self.base_model.predict_proba(woman_df)[0][1]
         except:
             man_prob = man_prediction
             woman_prob = woman_prediction

@@ -15,23 +15,17 @@ A comprehensive machine learning system that predicts divorce likelihood from bo
 ```
 ├── README.md                 # Project documentation
 ├── requirements.txt          # Python dependencies
-├── run_app.py               # Main entry point to run the app
-├── train_model.py           # Entry point to train the model
-├── app/                     # Main application
-│   ├── __init__.py
-│   ├── divorce_app.py       # Streamlit web application
-│   └── utils/               # Utility modules
-│       ├── __init__.py
-│       └── dual_perspective_predictor.py
-├── src/                     # Source code for training
-│   ├── __init__.py
-│   └── train_divorce_model.py
+├── streamlit_app.py         # Main entry point (deployment-ready)
+├── train_model.py           # Model training script (deployment-ready)
+├── utils/                   # Utility modules
+│   └── dual_perspective_predictor.py
 ├── data/                    # Dataset
 │   └── divorce_data.csv
 └── model/                   # Trained model files
     ├── divorce_features.pkl
     ├── divorce_model.pkl
-    └── feature_categories.pkl
+    ├── feature_categories.pkl
+    └── dual_perspective_config.pkl
 ```
 
 ## 🚀 Quick Start
@@ -56,14 +50,8 @@ pip install -r requirements.txt
 
 ### Running the Application
 
-**Option 1: Using the entry point script (Recommended)**
 ```bash
-python run_app.py
-```
-
-**Option 2: Direct Streamlit command**
-```bash
-streamlit run app/divorce_app.py
+streamlit run streamlit_app.py
 ```
 
 The application will open in your web browser at `http://localhost:8501`
@@ -72,14 +60,8 @@ The application will open in your web browser at `http://localhost:8501`
 
 To retrain the model with new data:
 
-**Option 1: Using the entry point script (Recommended)**
 ```bash
 python train_model.py
-```
-
-**Option 2: Direct training script**
-```bash
-python src/train_divorce_model.py
 ```
 
 ## 📱 Application Screens
@@ -133,6 +115,47 @@ The application is organized into 6 intuitive screens:
 - **Features**: 25+ carefully selected relationship and personal factors
 - **Approach**: Dual-perspective prediction system
 - **Accuracy**: Trained on relationship psychology research data
+
+## 🚀 Deployment
+
+### Cloud Platform Deployment
+
+This application is now **deployment-ready** for cloud platforms:
+
+**Streamlit Cloud:**
+- Main file: `streamlit_app.py`
+- Python version: 3.8+
+- No additional configuration needed
+
+**Heroku:**
+```bash
+echo "web: streamlit run streamlit_app.py --server.port=\$PORT --server.address=0.0.0.0" > Procfile
+```
+
+**Railway:**
+```bash
+streamlit run streamlit_app.py --server.port=$PORT --server.address=0.0.0.0
+```
+
+### Key Deployment Features
+✅ **No hardcoded paths** - Works from any directory
+✅ **Proper imports** - All modules accessible from project root
+✅ **Clean dependencies** - Fixed requirements.txt
+✅ **Single entry point** - streamlit_app.py handles everything
+
+## 🔧 Recent Fixes
+
+### Issues Resolved
+- ❌ **Removed problematic sys.path.append()** that only worked locally
+- ❌ **Fixed ModuleNotFoundError** for utils imports
+- ❌ **Corrected requirements.txt** (removed invalid 'pickle' dependency)
+- ❌ **Eliminated deployment path issues**
+
+### Improvements Made
+- ✅ **Created deployment-ready entry point** (`streamlit_app.py`)
+- ✅ **Consolidated all functionality** into single file
+- ✅ **Ensured cloud platform compatibility**
+- ✅ **Maintained all original features** and functionality
 
 ## 🤝 Contributing
 
