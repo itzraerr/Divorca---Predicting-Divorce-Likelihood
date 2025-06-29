@@ -6,8 +6,9 @@ Run with: streamlit run streamlit_app.py
 """
 
 import streamlit as st
-import pandas as pd
 import pickle
+import plotly.express as px
+import plotly.graph_objects as go
 
 # The dual perspective predictor is loaded from the saved model file
 
@@ -17,12 +18,13 @@ if 'current_screen' not in st.session_state:
 
 # Screen configuration
 SCREENS = {
-    1: {"title": "👨 Man's Personal Characteristics", "type": "man_personal"},
-    2: {"title": "👨 Man's Relationship Perspective", "type": "man_relationship"},
-    3: {"title": "👩 Woman's Personal Characteristics", "type": "woman_personal"},
-    4: {"title": "👩 Woman's Relationship Perspective", "type": "woman_relationship"},
-    5: {"title": "💑 Shared Relationship Factors", "type": "shared"},
-    6: {"title": "📊 Prediction Results", "type": "results"}
+    1: {"title": "🤖 Model Information", "type": "model_info"},
+    2: {"title": "👨 Man's Personal Characteristics", "type": "man_personal"},
+    3: {"title": "👨 Man's Relationship Perspective", "type": "man_relationship"},
+    4: {"title": "👩 Woman's Personal Characteristics", "type": "woman_personal"},
+    5: {"title": "👩 Woman's Relationship Perspective", "type": "woman_relationship"},
+    6: {"title": "💑 Shared Relationship Factors", "type": "shared"},
+    7: {"title": "📊 Prediction Results", "type": "results"}
 }
 
 # Load dual-perspective model and configuration
@@ -34,6 +36,10 @@ with open("model/divorce_features.pkl", "rb") as f:
 
 with open("model/feature_categories.pkl", "rb") as f:
     feature_categories = pickle.load(f)
+
+# Load model configuration for displaying performance metrics
+with open("model/dual_perspective_config.pkl", "rb") as f:
+    model_config = pickle.load(f)
 
 # Get feature categories
 individual_features = feature_categories['individual']
@@ -130,6 +136,108 @@ socializing_age_levels = [
 ]
 socializing_age_values = [30, 50, 70, 80, 75, 60]
 
+def render_model_info_screen():
+    st.markdown("**Enhanced Divorce Prediction Model Information**")
+
+    # Model Performance Metrics
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            label="🎯 Model F1 Score",
+            value=f"{model_config['model_f1_score']:.1%}",
+            delta=f"Accuracy: {model_config['model_accuracy']:.1%}"
+        )
+
+    with col2:
+        st.metric(
+            label="🧠 Best Model",
+            value=model_config['best_model_name'],
+            delta=f"Precision: {model_config['model_precision']:.1%}"
+        )
+
+    with col3:
+        st.metric(
+            label="📊 AUC Score",
+            value=f"{model_config['model_auc']:.1%}",
+            delta=f"Recall: {model_config['model_recall']:.1%}"
+        )
+
+    st.markdown("---")
+
+    # Feature Importance Visualization
+    st.subheader("🔍 Top Feature Importance")
+
+    # Get top 10 features for visualization
+    if 'feature_importance' in model_config and model_config['feature_importance']:
+        feature_importance_data = model_config['feature_importance'][:10]
+        features = [item['feature'] for item in feature_importance_data]
+        importance = [item['importance'] for item in feature_importance_data]
+    else:
+        # Use selected features as a fallback
+        features = model_config.get('selected_features', feature_list)[:10]
+        importance = [1.0/len(features)] * len(features)  # Equal importance as fallback
+
+    # Create horizontal bar chart
+    fig = px.bar(
+        x=importance,
+        y=features,
+        orientation='h',
+        title="Top 10 Most Important Features",
+        labels={'x': 'Importance Score', 'y': 'Features'},
+        color=importance,
+        color_continuous_scale='viridis'
+    )
+    fig.update_layout(height=400, yaxis={'categoryorder':'total ascending'})
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Model Comparison
+    st.subheader("📈 Model Performance Comparison")
+
+    if 'all_model_results' in model_config and model_config['all_model_results']:
+        model_names = list(model_config['all_model_results'].keys())
+        accuracies = [model_config['all_model_results'][name]['accuracy'] for name in model_names]
+        f1_scores = [model_config['all_model_results'][name]['f1_score'] for name in model_names]
+        auc_scores = [model_config['all_model_results'][name]['roc_auc'] for name in model_names]
+    else:
+        # Fallback data
+        model_names = [model_config['best_model_name']]
+        accuracies = [model_config['model_accuracy']]
+        f1_scores = [model_config['model_f1_score']]
+        auc_scores = [model_config['model_auc']]
+
+        # Create comparison chart
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            name='Accuracy',
+            x=model_names,
+            y=accuracies,
+            marker_color='lightblue'
+        ))
+        fig.add_trace(go.Bar(
+            name='F1 Score',
+            x=model_names,
+            y=f1_scores,
+            marker_color='lightgreen'
+        ))
+        fig.add_trace(go.Bar(
+            name='AUC Score',
+            x=model_names,
+            y=auc_scores,
+            marker_color='lightcoral'
+        ))
+
+        fig.update_layout(
+            title='Model Performance Comparison',
+            xaxis_title='Models',
+            yaxis_title='Score',
+            barmode='group',
+            height=400
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+
+
 def render_man_personal_screen():
     st.markdown("**Enter the man's personal characteristics:**")
 
@@ -195,6 +303,28 @@ def render_man_personal_screen():
                 key="man_socializing_age"
             )
             st.session_state.man_inputs[feature] = socializing_age_values[socializing_age_levels.index(selected_socializing_age)]
+
+        elif feature == "Height Ratio":
+            # Man's Height Ratio - 6 categories
+            man_height_ratio_labels = [
+                "Partner Much Taller Than Me",      # 0.85-0.95
+                "Partner Slightly Taller Than Me",  # 0.96-0.99
+                "We Are Similar Heights",           # 1.00-1.04
+                "I Am Moderately Taller",          # 1.05-1.15
+                "I Am Much Taller",                # 1.16-1.30
+                "I Am Extremely Taller"            # 1.31+
+            ]
+
+            man_height_ratio_values = [0.90, 0.97, 1.02, 1.10, 1.23, 1.35]
+
+            selected_man_height = st.selectbox(
+                "👨 Man's Height Ratio",
+                man_height_ratio_labels,
+                index=3,  # Default to "I Am Moderately Taller"
+                key="man_height_ratio",
+                help="How does your height compare to your partner's? This affects confidence and social comfort."
+            )
+            st.session_state.man_inputs[feature] = man_height_ratio_values[man_height_ratio_labels.index(selected_man_height)]
 
         else:
             value = st.slider(
@@ -351,6 +481,50 @@ def render_man_relationship_screen():
             )
             st.session_state.man_inputs[feature] = love_values[love_levels.index(selected_love)]
 
+        elif feature == "Commitment":
+            # Man's Commitment - 6 categories (from man's perspective)
+            man_commitment_labels = [
+                "I'm Not Ready to Commit",           # 15 - Fear of commitment, wants freedom
+                "I'm Uncertain About Long Term",     # 30 - Unsure about future together
+                "I'm Moderately Committed Now",      # 50 - Present-focused commitment
+                "I'm Seriously Committed to Her",    # 70 - Strong dedication and effort
+                "I'm Fully Devoted to This",         # 85 - Deep commitment, ready for marriage
+                "I'd Do Anything for This Love"      # 95 - Ultimate commitment, life partner
+            ]
+
+            man_commitment_values = [15, 30, 50, 70, 85, 95]
+
+            selected_man_commitment = st.selectbox(
+                "👨 Man's Commitment Level",
+                man_commitment_labels,
+                index=3,  # Default to "I'm Seriously Committed to Her"
+                key="man_commitment",
+                help="How committed are you to this relationship? This affects dedication and future planning."
+            )
+            st.session_state.man_inputs[feature] = man_commitment_values[man_commitment_labels.index(selected_man_commitment)]
+
+        elif feature == "The Sense of Having Children":
+            # Man's Sense of Having Children - 6 categories (from man's perspective)
+            man_children_labels = [
+                "I Don't Want Kids at All",          # 10 - Strongly opposed to having children
+                "I'm Not Ready for Kids Yet",        # 25 - Not interested currently, maybe later
+                "I'm Unsure About Having Kids",      # 45 - Uncertain, depends on circumstances
+                "I Want Kids with Her Someday",      # 70 - Interested in having children together
+                "I'm Excited About Our Future Kids", # 85 - Strongly wants children, planning ahead
+                "Having Kids Is My Dream Goal"       # 95 - Children are central to life vision
+            ]
+
+            man_children_values = [10, 25, 45, 70, 85, 95]
+
+            selected_man_children = st.selectbox(
+                "👨 Man's Sense of Having Children",
+                man_children_labels,
+                index=3,  # Default to "I Want Kids with Her Someday"
+                key="man_children_sense",
+                help="How do you feel about having children together? This affects family planning and future goals."
+            )
+            st.session_state.man_inputs[feature] = man_children_values[man_children_labels.index(selected_man_children)]
+
         # Add other perspective-dependent features here...
         else:
             value = st.slider(
@@ -425,6 +599,28 @@ def render_woman_personal_screen():
                 key="woman_socializing_age"
             )
             st.session_state.woman_inputs[feature] = socializing_age_values[socializing_age_levels.index(selected_socializing_age)]
+
+        elif feature == "Height Ratio":
+            # Woman's Height Ratio - 6 categories (from woman's perspective)
+            woman_height_ratio_labels = [
+                "I Am Much Taller",                 # 0.85-0.95
+                "I Am Slightly Taller",            # 0.96-0.99
+                "We Are Similar Heights",           # 1.00-1.04
+                "He Is Moderately Taller",         # 1.05-1.15
+                "He Is Much Taller",               # 1.16-1.30
+                "He Is Extremely Taller"           # 1.31+
+            ]
+
+            woman_height_ratio_values = [0.90, 0.97, 1.02, 1.10, 1.23, 1.35]
+
+            selected_woman_height = st.selectbox(
+                "👩 Woman's Height Ratio",
+                woman_height_ratio_labels,
+                index=3,  # Default to "He Is Moderately Taller"
+                key="woman_height_ratio",
+                help="How does his height compare to yours? This affects feelings of protection and femininity."
+            )
+            st.session_state.woman_inputs[feature] = woman_height_ratio_values[woman_height_ratio_labels.index(selected_woman_height)]
 
         else:
             value = st.slider(
@@ -570,6 +766,50 @@ def render_woman_relationship_screen():
                 key="woman_love"
             )
             st.session_state.woman_inputs[feature] = love_values[love_levels.index(selected_love)]
+
+        elif feature == "Commitment":
+            # Woman's Commitment - 6 categories (from woman's perspective)
+            woman_commitment_labels = [
+                "I Need More Time to Decide",        # 15 - Cautious, wants to be sure
+                "I'm Still Evaluating This",         # 30 - Assessing compatibility and future
+                "I'm Growing More Committed",        # 50 - Building commitment gradually
+                "I'm Deeply Committed to Him",       # 70 - Strong emotional investment
+                "I'm Ready for Our Future",          # 85 - Committed to building life together
+                "He's My Forever Person"             # 95 - Ultimate commitment, soulmate level
+            ]
+
+            woman_commitment_values = [15, 30, 50, 70, 85, 95]
+
+            selected_woman_commitment = st.selectbox(
+                "👩 Woman's Commitment Level",
+                woman_commitment_labels,
+                index=3,  # Default to "I'm Deeply Committed to Him"
+                key="woman_commitment",
+                help="How committed are you to this relationship? This affects emotional investment and future planning."
+            )
+            st.session_state.woman_inputs[feature] = woman_commitment_values[woman_commitment_labels.index(selected_woman_commitment)]
+
+        elif feature == "The Sense of Having Children":
+            # Woman's Sense of Having Children - 6 categories (from woman's perspective)
+            woman_children_labels = [
+                "I Don't Want to Be Mother",         # 10 - Strongly opposed to motherhood
+                "I'm Not Ready for Motherhood",      # 25 - Not ready now, biological clock concerns
+                "I'm Conflicted About Having Kids",  # 45 - Mixed feelings, career vs family concerns
+                "I Want to Start Our Family",        # 70 - Ready for children, family planning
+                "I'm Longing to Be a Mother",        # 85 - Strong maternal instincts, excited about pregnancy
+                "Motherhood Is My Life's Purpose"    # 95 - Children are central to identity and dreams
+            ]
+
+            woman_children_values = [10, 25, 45, 70, 85, 95]
+
+            selected_woman_children = st.selectbox(
+                "👩 Woman's Sense of Having Children",
+                woman_children_labels,
+                index=3,  # Default to "I Want to Start Our Family"
+                key="woman_children_sense",
+                help="How do you feel about having children together? This affects maternal instincts and family planning."
+            )
+            st.session_state.woman_inputs[feature] = woman_children_values[woman_children_labels.index(selected_woman_children)]
 
         # Add other perspective-dependent features here...
         else:
@@ -799,7 +1039,7 @@ def render_shared_screen():
             st.session_state.shared_inputs[feature] = value
 
 def render_results_screen():
-    st.markdown("**Divorce Prediction Results:**")
+    st.markdown("**Enhanced Divorce Prediction Results:**")
 
     if st.button("🔍 Generate Predictions", type="primary"):
         try:
@@ -810,7 +1050,79 @@ def render_results_screen():
                 st.session_state.shared_inputs
             )
 
-            # Display results
+            # Overall Risk Assessment
+            st.subheader("🎯 Overall Risk Assessment")
+
+            combined_risk = results['combined_risk']
+            confidence_score = results['confidence_score']
+
+            # Risk level determination
+            if combined_risk > 0.7:
+                risk_level = "Very High Risk"
+                risk_emoji = "🚨"
+            elif combined_risk > 0.5:
+                risk_level = "High Risk"
+                risk_emoji = "⚠️"
+            elif combined_risk > 0.3:
+                risk_level = "Moderate Risk"
+                risk_emoji = "⚡"
+            else:
+                risk_level = "Low Risk"
+                risk_emoji = "✅"
+
+            # Display overall assessment
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.metric(
+                    label="Combined Risk Level",
+                    value=f"{risk_emoji} {risk_level}",
+                    delta=f"{combined_risk:.1%}"
+                )
+
+            with col2:
+                st.metric(
+                    label="Model Confidence",
+                    value=f"{confidence_score:.1%}",
+                    delta="Higher is better"
+                )
+
+            with col3:
+                st.metric(
+                    label="Prediction Alignment",
+                    value="Aligned" if abs(results['man_probability'] - results['woman_probability']) < 0.2 else "Different",
+                    delta=f"Δ {abs(results['man_probability'] - results['woman_probability']):.1%}"
+                )
+
+            # Risk gauge visualization
+            fig = go.Figure(go.Indicator(
+                mode = "gauge+number+delta",
+                value = combined_risk * 100,
+                domain = {'x': [0, 1], 'y': [0, 1]},
+                title = {'text': "Combined Divorce Risk (%)"},
+                delta = {'reference': 50},
+                gauge = {
+                    'axis': {'range': [None, 100]},
+                    'bar': {'color': "darkblue"},
+                    'steps': [
+                        {'range': [0, 30], 'color': "lightgreen"},
+                        {'range': [30, 50], 'color': "yellow"},
+                        {'range': [50, 70], 'color': "orange"},
+                        {'range': [70, 100], 'color': "red"}
+                    ],
+                    'threshold': {
+                        'line': {'color': "red", 'width': 4},
+                        'thickness': 0.75,
+                        'value': 70
+                    }
+                }
+            ))
+            fig.update_layout(height=300)
+            st.plotly_chart(fig, use_container_width=True)
+
+            st.markdown("---")
+
+            # Individual perspective results
             col1, col2 = st.columns(2)
 
             with col1:
@@ -818,17 +1130,62 @@ def render_results_screen():
                 man_risk = "High Risk" if results['man_prediction'] == 1 else "Low Risk"
                 man_color = "red" if results['man_prediction'] == 1 else "green"
                 st.markdown(f"**Divorce Risk:** <span style='color: {man_color}'>{man_risk}</span>", unsafe_allow_html=True)
-                st.markdown(f"**Confidence:** {results['man_probability']:.1%}")
+                st.markdown(f"**Probability:** {results['man_probability']:.1%}")
+
+                # Man's risk bar
+                fig_man = px.bar(
+                    x=['Low Risk', 'High Risk'],
+                    y=[1-results['man_probability'], results['man_probability']],
+                    title="Man's Risk Assessment",
+                    color=['Low Risk', 'High Risk'],
+                    color_discrete_map={'Low Risk': 'green', 'High Risk': 'red'}
+                )
+                fig_man.update_layout(height=250, showlegend=False)
+                st.plotly_chart(fig_man, use_container_width=True)
 
             with col2:
                 st.subheader("👩 Woman's Perspective")
                 woman_risk = "High Risk" if results['woman_prediction'] == 1 else "Low Risk"
                 woman_color = "red" if results['woman_prediction'] == 1 else "green"
                 st.markdown(f"**Divorce Risk:** <span style='color: {woman_color}'>{woman_risk}</span>", unsafe_allow_html=True)
-                st.markdown(f"**Confidence:** {results['woman_probability']:.1%}")
+                st.markdown(f"**Probability:** {results['woman_probability']:.1%}")
+
+                # Woman's risk bar
+                fig_woman = px.bar(
+                    x=['Low Risk', 'High Risk'],
+                    y=[1-results['woman_probability'], results['woman_probability']],
+                    title="Woman's Risk Assessment",
+                    color=['Low Risk', 'High Risk'],
+                    color_discrete_map={'Low Risk': 'green', 'High Risk': 'red'}
+                )
+                fig_woman.update_layout(height=250, showlegend=False)
+                st.plotly_chart(fig_woman, use_container_width=True)
+
+            # Recommendations based on results
+            st.subheader("💡 Recommendations")
+
+            if combined_risk > 0.6:
+                st.warning("**High Risk Detected:** Consider couples counseling and addressing key risk factors.")
+                st.write("Focus areas:")
+                st.write("- Communication and conflict resolution")
+                st.write("- Family support and approval")
+                st.write("- Commitment and loyalty strengthening")
+            elif combined_risk > 0.4:
+                st.info("**Moderate Risk:** Some areas need attention for a stronger relationship.")
+                st.write("Suggestions:")
+                st.write("- Work on shared interests and compatibility")
+                st.write("- Improve family relationships")
+                st.write("- Strengthen emotional connection")
+            else:
+                st.success("**Low Risk:** Strong foundation for a lasting marriage!")
+                st.write("Maintain:")
+                st.write("- Open communication")
+                st.write("- Mutual respect and support")
+                st.write("- Shared goals and values")
 
         except Exception as e:
             st.error(f"Error generating predictions: {str(e)}")
+            st.write("Please ensure all required fields are filled in previous screens.")
 
     # Show summary of inputs
     with st.expander("📋 Input Summary"):
@@ -861,7 +1218,9 @@ st.progress(progress)
 st.markdown("---")
 
 # Render current screen
-if current_screen['type'] == 'man_personal':
+if current_screen['type'] == 'model_info':
+    render_model_info_screen()
+elif current_screen['type'] == 'man_personal':
     render_man_personal_screen()
 elif current_screen['type'] == 'man_relationship':
     render_man_relationship_screen()
