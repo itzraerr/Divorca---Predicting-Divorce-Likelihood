@@ -318,7 +318,7 @@ def render_man_personal_screen():
             man_height_ratio_values = [0.90, 0.97, 1.02, 1.10, 1.23, 1.35]
 
             selected_man_height = st.selectbox(
-                "👨 Man's Height Ratio",
+                " Man's Height Ratio",
                 man_height_ratio_labels,
                 index=3,  # Default to "I Am Moderately Taller"
                 key="man_height_ratio",
@@ -495,7 +495,7 @@ def render_man_relationship_screen():
             man_commitment_values = [15, 30, 50, 70, 85, 95]
 
             selected_man_commitment = st.selectbox(
-                "👨 Man's Commitment Level",
+                " Man's Commitment Level",
                 man_commitment_labels,
                 index=3,  # Default to "I'm Seriously Committed to Her"
                 key="man_commitment",
@@ -517,7 +517,7 @@ def render_man_relationship_screen():
             man_children_values = [10, 25, 45, 70, 85, 95]
 
             selected_man_children = st.selectbox(
-                "👨 Man's Sense of Having Children",
+                " Man's Sense of Having Children",
                 man_children_labels,
                 index=3,  # Default to "I Want Kids with Her Someday"
                 key="man_children_sense",
@@ -614,7 +614,7 @@ def render_woman_personal_screen():
             woman_height_ratio_values = [0.90, 0.97, 1.02, 1.10, 1.23, 1.35]
 
             selected_woman_height = st.selectbox(
-                "👩 Woman's Height Ratio",
+                " Woman's Height Ratio",
                 woman_height_ratio_labels,
                 index=3,  # Default to "He Is Moderately Taller"
                 key="woman_height_ratio",
@@ -781,7 +781,7 @@ def render_woman_relationship_screen():
             woman_commitment_values = [15, 30, 50, 70, 85, 95]
 
             selected_woman_commitment = st.selectbox(
-                "👩 Woman's Commitment Level",
+                " Woman's Commitment Level",
                 woman_commitment_labels,
                 index=3,  # Default to "I'm Deeply Committed to Him"
                 key="woman_commitment",
@@ -803,7 +803,7 @@ def render_woman_relationship_screen():
             woman_children_values = [10, 25, 45, 70, 85, 95]
 
             selected_woman_children = st.selectbox(
-                "👩 Woman's Sense of Having Children",
+                " Woman's Sense of Having Children",
                 woman_children_labels,
                 index=3,  # Default to "I Want to Start Our Family"
                 key="woman_children_sense",
